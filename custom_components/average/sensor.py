@@ -492,6 +492,7 @@ class AverageSensor(SensorEntity):
                     _LOGGER.debug("Initial historical state: %s", item)
                     last_state = None
                     last_time = start_ts
+                    has_valid_data = 0
                     if item is not None and self._has_state(item.state):
                         last_state = self._get_state_value(item)
 
@@ -505,6 +506,7 @@ class AverageSensor(SensorEntity):
                             last_elapsed = current_time - last_time
                             value += last_state * last_elapsed
                             elapsed += last_elapsed
+                            has_valid_data = 1
 
                         last_state = current_state
                         last_time = current_time
@@ -517,6 +519,8 @@ class AverageSensor(SensorEntity):
 
                     if elapsed:
                         value /= elapsed
+                    if not has_valid_data:
+                        value = None
                     _LOGGER.debug("Historical average state: %s", value)
 
             if isinstance(value, numbers.Number):
